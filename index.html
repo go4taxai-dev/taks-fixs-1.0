@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taks-Fixs - Premium Financial Services</title>
+    <meta name="description" content="Taks-Fixs: Secure, seamless management of GST, Income Tax, ROC, and Insurance services for businesses and individuals.">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest" defer></script>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div id="app">
+        <!-- Initial Loader -->
+        <div class="loader-container">
+            <img src="/taksfixs_logo.png" alt="Taks-Fixs" style="height: 60px; margin-bottom: 24px; object-fit: contain;">
+            <div class="spinner"></div>
+        </div>
+    </div>
+    <script>
+        // Safely stub external libraries if they fail to load (e.g. when offline or CDN is blocked)
+        window.lucide = window.lucide || { 
+            createIcons: () => console.log('[STUB] Lucide icons processed') 
+        };
+        window.io = window.io || function(url) {
+            console.log('[STUB] Socket.io connected to:', url);
+            return {
+                on: (ev, cb) => console.log('[STUB] Socket.on:', ev),
+                emit: (ev, data) => console.log('[STUB] Socket.emit:', ev, data),
+                disconnect: () => {}
+            };
+        };
+        window.XLSX = window.XLSX || {
+            utils: {
+                book_new: () => ({}),
+                json_to_sheet: () => ({}),
+                book_append_sheet: () => {},
+                sheet_to_json: () => []
+            },
+            write: () => '',
+            writeFile: () => console.log('[STUB] XLSX writeFile called')
+        };
+    </script>
+    <script>
+        // Check if running on file:// protocol (Offline Local File mode)
+        window.isLocalFileMode = window.location.protocol === 'file:';
+        if (window.isLocalFileMode) {
+            console.log('[MODE] Running in offline Local File mode (CORS/ES Module bypass)');
+            document.write('<script src="js/bundle.js"><\/script>');
+        }
+    </script>
+    <script>
+        if (!window.isLocalFileMode) {
+            console.log('[MODE] Running in standard Web Server mode');
+            const script = document.createElement('script');
+            script.type = 'module';
+            script.src = 'js/app.js';
+            document.body.appendChild(script);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: taks_fixs_app
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DB_USER=postgres
+      - DB_PASSWORD=taksfixs_db_pass_2026
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=taks_fixs
+      - JWT_SECRET=your_production_jwt_secret_key_here
+      # Uncomment and fill these to enable AWS S3 Uploads in production
+      # - AWS_REGION=ap-south-1
+      # - AWS_ACCESS_KEY_ID=your_aws_access_key
+      # - AWS_SECRET_ACCESS_KEY=your_aws_secret_key
+      # - AWS_S3_BUCKET_NAME=taks-fixs-documents
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - taks-network
+
+  db:
+    image: postgres:15-alpine
+    container_name: taks_fixs_db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=taksfixs_db_pass_2026
+      - POSTGRES_DB=taks_fixs
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      # Automatically initialize the database with our schema and seed files on first startup!
+      - ./backend/schema.sql:/docker-entrypoint-initdb.d/1-schema.sql
+      - ./backend/seed.sql:/docker-entrypoint-initdb.d/2-seed.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d taks_fixs"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - taks-network
+
+volumes:
+  pgdata:
+
+networks:
+  taks-network:
+    driver: bridge
